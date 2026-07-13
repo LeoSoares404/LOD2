@@ -54,3 +54,6 @@ crashlytics-build.properties
 # OS
 .DS_Store
 Thumbs.db
+
+# Solucao nova do Unity (regeneravel)
+*.slnx
