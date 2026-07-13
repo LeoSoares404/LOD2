@@ -23,6 +23,9 @@ public class GameBootstrap : MonoBehaviour
         SetColor(player, new Color(0.5f, 0.25f, 0.7f));
         player.AddComponent<PlayerController>();
 
+        // --- construção da cripta (set-piece billboard, ao norte) ---
+        BuildBillboardSprite("crypt_entrance", new Vector3(0, 0, 8f), 120f);
+
         // --- câmera iso na Main Camera existente ---
         var cam = Camera.main;
         if (cam != null)
@@ -42,5 +45,25 @@ public class GameBootstrap : MonoBehaviour
     {
         // instancia o material pra não alterar o material compartilhado
         go.GetComponent<Renderer>().material.color = c;
+    }
+
+    /// Cria um sprite billboard a partir de um PNG em Assets/Resources.
+    /// Pivô na base (fica em pé no chão); `ppu` = pixels por unidade (tamanho).
+    static void BuildBillboardSprite(string resourceName, Vector3 pos, float ppu)
+    {
+        var tex = Resources.Load<Texture2D>(resourceName);
+        if (tex == null)
+        {
+            Debug.LogWarning($"GameBootstrap: '{resourceName}' não encontrado em Assets/Resources.");
+            return;
+        }
+        var go = new GameObject(resourceName);
+        go.transform.position = pos;
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = Sprite.Create(
+            tex, new Rect(0, 0, tex.width, tex.height),
+            new Vector2(0.5f, 0f),  // pivô base-centro: assenta no chão
+            ppu);
+        go.AddComponent<Billboard>();
     }
 }
