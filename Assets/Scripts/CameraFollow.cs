@@ -28,6 +28,13 @@ public class CameraFollow : MonoBehaviour
         transform.rotation = Quaternion.Euler(pitch, 0f, 0f);
     }
 
+    /// Corta a suavização e cola no alvo (teleportes: portas, superataque).
+    public void Snap()
+    {
+        if (target != null)
+            transform.position = DesiredPosition();
+    }
+
     Vector3 DesiredPosition()
     {
         float r = pitch * Mathf.Deg2Rad;

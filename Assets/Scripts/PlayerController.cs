@@ -1,8 +1,9 @@
 using UnityEngine;
 
-/// Player 2.5D no plano XZ. Movimento WASD + click-to-move (segurar botão
-/// direito, estilo Diablo). Porte simplificado de player.gd (LOD/Godot).
-/// Expõe Velocity/IsMoving pro animador de sprite.
+/// Player 2.5D no plano XZ (porte de player.gd). Esquemas do LOD:
+/// "mouse" (Clássico) = andar segurando o botão direito, estilo Diablo;
+/// "wasd" (Moderno) = WASD move (e as skills remapeiam pra Q/E/C/R).
+/// F1 troca o esquema (ver PlayerCombat).
 public class PlayerController : MonoBehaviour
 {
     public float speed = 5.6f;            // m/s (LOD: SPEED)
@@ -21,6 +22,13 @@ public class PlayerController : MonoBehaviour
         _target = transform.position;
     }
 
+    /// Cancela o click-to-move (usado em teleportes: portas, superataque, morte).
+    public void CancelMove()
+    {
+        _clickMoving = false;
+        _target = transform.position;
+    }
+
     void Update()
     {
         Vector3 vel = WasdVelocity();
@@ -34,19 +42,22 @@ public class PlayerController : MonoBehaviour
 
     Vector3 WasdVelocity()
     {
+        if (GameState.ControlScheme != "wasd")
+            return Vector3.zero;   // no Clássico, WASD são teclas de skill/nada
+
         Vector3 d = Vector3.zero;
-        if (Input.GetKey(KeyCode.W)) d.z += 1;  // "cima" na tela (longe da câmera)
+        if (Input.GetKey(KeyCode.W)) d.z += 1;
         if (Input.GetKey(KeyCode.S)) d.z -= 1;
         if (Input.GetKey(KeyCode.D)) d.x += 1;
         if (Input.GetKey(KeyCode.A)) d.x -= 1;
         if (d != Vector3.zero)
-            _clickMoving = false;  // WASD tem prioridade e cancela o click-to-move
+            _clickMoving = false;
         return d.normalized * speed;
     }
 
     Vector3 ClickVelocity()
     {
-        // segurar o botão direito segue o cursor (LOD: move_click = botão direito)
+        // segurar o botão direito segue o cursor (LOD: move_click)
         if (Input.GetMouseButton(1) && _cam != null && _cam.MouseGroundPosition(out Vector3 p))
         {
             _target = p;
