@@ -16,12 +16,13 @@ public class GameBootstrap : MonoBehaviour
         ground.transform.localScale = new Vector3(10, 1, 10);  // Plane 10x10 -> 100x100 m
         SetColor(ground, new Color(0.34f, 0.5f, 0.22f));
 
-        // --- player (cápsula roxa, placeholder do mago) ---
-        var player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-        player.name = "Player";
-        player.transform.position = new Vector3(0, 1, 0);  // metade da altura da cápsula
-        SetColor(player, new Color(0.5f, 0.25f, 0.7f));
+        // --- player (sprite do mago, billboard) ---
+        var player = new GameObject("Player");
+        player.transform.position = Vector3.zero;  // pivô do sprite na base -> pés no chão
+        player.AddComponent<SpriteRenderer>();
+        player.AddComponent<Billboard>();
         player.AddComponent<PlayerController>();
+        player.AddComponent<PlayerSpriteAnimator>();  // fatia mago_walk e anima
 
         // --- construção da cripta (set-piece billboard, ao norte) ---
         BuildBillboardSprite("crypt_entrance", new Vector3(0, 0, 8f), 120f);
