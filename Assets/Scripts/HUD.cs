@@ -22,9 +22,9 @@ public class HUD : MonoBehaviour
 
     Health _health;
     PlayerCombat _combat;
-    Image _healthFill, _manaFill;
+    Image _healthFill, _manaFill, _xpFill;
     readonly Image[] _cd = new Image[4];
-    Text _counter, _banner, _scheme;
+    Text _counter, _banner, _scheme, _gold, _level;
     float _bannerT, _bannerHold;
     Color _bannerColor = Color.white;
 
@@ -98,6 +98,21 @@ public class HUD : MonoBehaviour
         // --- esquema de controle (topo-esq.) ---
         _scheme = NewText("Scheme", new Vector2(0f, 1f), new Vector2(210, -20), new Vector2(400, 24), 12, TextAnchor.MiddleLeft);
 
+        // --- ouro (topo-dir.) ---
+        _gold = NewText("Gold", new Vector2(1f, 1f), new Vector2(-110, -20), new Vector2(200, 24), 16, TextAnchor.MiddleRight);
+        _gold.color = new Color(1f, 0.85f, 0.25f);
+        _gold.text = "Ouro: 0";
+
+        // --- barra de XP + nível (base da tela) ---
+        NewImage("XpBg", new Vector2(0.5f, 0f), new Vector2(0, 16), new Vector2(420, 7), null, new Color(0f, 0f, 0f, 0.55f));
+        _xpFill = NewImage("XpFill", new Vector2(0.5f, 0f), new Vector2(0, 16), new Vector2(420, 7), null, new Color(0.45f, 0.75f, 1f, 0.9f));
+        _xpFill.type = Image.Type.Filled;
+        _xpFill.fillMethod = Image.FillMethod.Horizontal;
+        _xpFill.fillOrigin = (int)Image.OriginHorizontal.Left;
+        _xpFill.fillAmount = 0f;
+        _level = NewText("Level", new Vector2(0.5f, 0f), new Vector2(-238, 16), new Vector2(70, 20), 13, TextAnchor.MiddleRight);
+        _level.text = "Nv 1";
+
         // --- botão da mochila (inferior-dir.) ---
         var bagImg = NewImage("Backpack", new Vector2(1f, 0f), new Vector2(-52, 60), new Vector2(64, 64), SpriteUtil.Ui("inventory_backpack"), Color.white);
         bagImg.raycastTarget = true;   // NewImage desliga por padrão; botão precisa
@@ -161,6 +176,12 @@ public class HUD : MonoBehaviour
             for (int i = 0; i < 4; i++)
                 _cd[i].fillAmount = _combat.CooldownFraction(i);
         }
+        if (_gold != null)
+            _gold.text = $"Ouro: {GameState.Gold}";
+        if (_level != null)
+            _level.text = $"Nv {GameState.Level}";
+        if (_xpFill != null)
+            _xpFill.fillAmount = Mathf.Clamp01((float)GameState.Xp / GameState.XpToNext());
         if (_scheme != null)
             _scheme.text = GameState.ControlScheme == "mouse"
                 ? "Clássico: andar = botão direito · F1 troca"

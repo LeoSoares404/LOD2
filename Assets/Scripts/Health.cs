@@ -34,6 +34,13 @@ public class Health : MonoBehaviour
             Died?.Invoke();
     }
 
+    public void Heal(int amount)
+    {
+        if (IsDead) return;
+        Current = Mathf.Min(Current + amount, maxHealth);
+        Changed?.Invoke(Current, maxHealth);
+    }
+
     public void HealFull()
     {
         Current = maxHealth;

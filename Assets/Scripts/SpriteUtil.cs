@@ -37,6 +37,26 @@ public static class SpriteUtil
         return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0f), ppu);
     }
 
+    /// Sprite circular gerado em pixel (moedas/poções sem arte dedicada).
+    public static Sprite Circle(Color c, int size = 10, float ppu = 16f)
+    {
+        var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Point;
+        float r = size / 2f - 0.5f;
+        var dark = new Color(c.r * 0.45f, c.g * 0.45f, c.b * 0.45f, 1f);
+        for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+            {
+                float dx = x - (size - 1) / 2f;
+                float dy = y - (size - 1) / 2f;
+                float d = Mathf.Sqrt(dx * dx + dy * dy);
+                Color px = d <= r ? (d > r - 1.3f ? dark : c) : Color.clear;
+                tex.SetPixel(x, y, px);
+            }
+        tex.Apply();
+        return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), ppu);
+    }
+
     /// Textura inteira como sprite de UI (pivô central).
     public static Sprite Ui(string resourceName)
     {

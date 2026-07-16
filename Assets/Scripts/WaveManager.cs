@@ -45,28 +45,30 @@ public class WaveManager : MonoBehaviour
         switch (_wave)
         {
             case 1:
-                SpawnMany(4, 12, 2.2f, 3, Color.white, 1f);
+                SpawnMany(4, 12, 2.2f, 3, Color.white, 1f, 5, 2, 4, 0.12f);
                 break;
             case 2:
-                SpawnMany(5, 12, 2.2f, 3, Color.white, 1f);
-                SpawnMany(2, 6, 4.4f, 2, new Color(1f, 0.55f, 0.5f), 0.9f);   // sprinters
+                SpawnMany(5, 12, 2.2f, 3, Color.white, 1f, 5, 2, 4, 0.12f);
+                SpawnMany(2, 6, 4.4f, 2, new Color(1f, 0.55f, 0.5f), 0.9f, 4, 2, 3, 0.12f);  // sprinters
                 break;
             case 3:
-                SpawnOne(60, 1.6f, 8, new Color(0.75f, 1f, 0.75f), 2.1f);     // boss
+                SpawnOne(60, 1.6f, 8, new Color(0.75f, 1f, 0.75f), 2.1f, 25, 15, 25, 1f);     // boss
                 break;
             case 4:
-                SpawnOne(45, 3.4f, 6, new Color(1f, 0.5f, 0.9f), 1.7f);       // boss veloz
+                SpawnOne(45, 3.4f, 6, new Color(1f, 0.5f, 0.9f), 1.7f, 20, 12, 20, 1f);       // boss veloz
                 break;
         }
     }
 
-    void SpawnMany(int count, int hp, float speed, int dmg, Color tint, float scale)
+    void SpawnMany(int count, int hp, float speed, int dmg, Color tint, float scale,
+        int xp, int goldMin, int goldMax, float itemChance)
     {
         for (int i = 0; i < count; i++)
-            SpawnOne(hp, speed, dmg, tint, scale);
+            SpawnOne(hp, speed, dmg, tint, scale, xp, goldMin, goldMax, itemChance);
     }
 
-    void SpawnOne(int hp, float speed, int dmg, Color tint, float scale)
+    void SpawnOne(int hp, float speed, int dmg, Color tint, float scale,
+        int xp, int goldMin, int goldMax, float itemChance)
     {
         var go = new GameObject("Enemy");
         go.transform.position = RandomPoint();
@@ -76,6 +78,10 @@ public class WaveManager : MonoBehaviour
         e.speed = speed;
         e.touchDamage = dmg;
         e.leash = bounds;
+        e.xpReward = xp;
+        e.goldMin = goldMin;
+        e.goldMax = goldMax;
+        e.itemChance = itemChance;
         e.Setup(_ghoulFrames, tint, scale);
         e.OnDeath = OnEnemyDeath;
         _alive.Add(e);

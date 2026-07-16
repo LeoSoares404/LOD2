@@ -13,6 +13,12 @@ public class Enemy : MonoBehaviour
     public Rect leash;                 // limites XZ onde pode caçar (vazio = sempre)
     public Action<Enemy> OnDeath;
 
+    // loot (GDD: mobs dropam ouro, XP e chance de item)
+    public int xpReward = 5;
+    public int goldMin = 2;
+    public int goldMax = 4;
+    public float itemChance = 0.12f;
+
     Health _health;
     Transform _player;
     Health _playerHealth;
@@ -128,7 +134,34 @@ public class Enemy : MonoBehaviour
     void Die()
     {
         Fx.Sphere(transform.position + Vector3.up * 0.6f, 0.5f, new Color(0.5f, 0.1f, 0.15f, 0.6f), 0.35f, 2.2f);
+        DropLoot();
         OnDeath?.Invoke(this);
         Destroy(gameObject);
+    }
+
+    void DropLoot()
+    {
+        // XP direto no player (+ level up cura, como recompensa)
+        if (xpReward > 0)
+        {
+            int levelsGained = GameState.AddXp(xpReward);
+            DamageNumber.Spawn(transform.position + Vector3.up * 1.9f,
+                $"+{xpReward} XP", new Color(0.5f, 0.85f, 1f));
+            if (levelsGained > 0)
+            {
+                if (HUD.Instance != null)
+                    HUD.Instance.Banner($"NÍVEL {GameState.Level}!", new Color(0.55f, 0.9f, 1f), 2.5f);
+                if (_playerHealth != null)
+                    _playerHealth.HealFull();
+            }
+        }
+
+        // ouro no chão (pickup com ímã)
+        if (goldMax > 0)
+            Pickup.SpawnGold(transform.position, UnityEngine.Random.Range(goldMin, goldMax + 1));
+
+        // chance de item (poção de vida por enquanto; itens reais = passo 2)
+        if (UnityEngine.Random.value < itemChance)
+            Pickup.SpawnPotion(transform.position, 6);
     }
 }
